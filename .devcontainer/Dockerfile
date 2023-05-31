@@ -3,7 +3,7 @@ FROM python:3.11-bullseye
 # ------------------------- install required packages ------------------------ #
 RUN set -eux \
   && apt-get update \
-  && apt-get install -y sudo bash bash-completion git vim nodejs \
+  && apt-get install -y sudo bash bash-completion git vim nodejs npm \
   && apt-get clean
 
 # --------------------------- create non root user --------------------------- #

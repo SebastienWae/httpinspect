@@ -3,8 +3,13 @@ FROM python:3.11-bullseye
 # ------------------------- install required packages ------------------------ #
 RUN set -eux \
   && apt-get update \
-  && apt-get install -y sudo bash bash-completion git vim nodejs npm \
+  && apt-get install -y sudo bash bash-completion git vim \
   && apt-get clean
+
+# ------------------------------ install nodejs ------------------------------ #
+RUN set -eux \
+  && curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+  && apt-get install -y nodejs
 
 # --------------------------- create non root user --------------------------- #
 ARG USERNAME=dev

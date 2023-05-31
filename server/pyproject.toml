@@ -1,0 +1,91 @@
+[tool.poetry]
+name = "httpinspect"
+version = "0.1.0"
+description = ""
+authors = ["Sebastien Waegeneiere <sebastien@waegeneire.com>"]
+license = "MIT License"
+packages = [{include = "httpinspect"}]
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+code-analyzer = "code_analyzer.main:run"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+nox = "^2022.11.21"
+nox-poetry = "^1.0.2"
+fastapi = "^0.95.2"
+uvicorn = {extras = ["standard"], version = "^0.22.0"}
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.0.262"
+black = "^23.3.0"
+mypy = "^1.2.0"
+
+[tool.poetry.group.test.dependencies]
+pytest = "^7.3.1"
+coverage = "^7.2.3"
+
+[tool.mypy]
+strict = true
+explicit_package_bases = true
+
+[tool.black]
+line-length = 88
+
+[tool.ruff]
+line-length = 88
+select = [
+  "F", # Pyflakes
+  "E", # pycodestyle (error)
+  "W", # pycodestyle (warning)
+  "C90", # mccabe
+  "I", # isort
+  "N", # pep8-naming
+  # D, # pydocstyle
+  "UP", # pyupgrade
+  "ANN", # flake9-annotations
+  "S", # flake8-bandit
+  "BLE", # flake8-blind-except
+  "FBT", # flake8-boolean-trap
+  "B", # flake8-bugbear
+  "A", # flake8-builtins
+  "COM", # flake8-commas
+  "C4", # flake8-comprehensions
+  "DTZ", # flake8-datetimez
+  "T10", # flake8-debugger
+  "EM", # flake8-errmsg
+  "ISC", # flake8-implicit-str-concat
+  "ICN", # flake8-import-conventions
+  "G", # flake8-logging-format
+  "INP", # flake8-no-pep420
+  "PIE", # flake8-pie
+  # "T20", # flake8-print 
+  "PYI", # flake8-pyi
+  "PT", # flake8-pytest-style
+  "Q", # flake8-quotes
+  "RSE", # flake8-raise
+  "RET", # flake8-return 
+  "SLF", # flake8-self
+  "SIM", # flake8-simplify
+  "TID", # flake8-tidy-imports
+  "TCH", # flake8-type-checking
+  "ARG", # flake8-unused-arguments
+  "PTH", # flake8-use-pathlib 
+  # "PD", # pandas-vet
+  "PLC", # Pylint (Convention)
+  "PLE", # Pylint (Error)
+  "PLR", # Pylint (Refactor)
+  "PLW", # Pylint (Warning)
+  "TRY", # tryceratops
+  # "NPY", # NumPy-specific rules
+  "RUF", # Ruff-specific rules
+]
+ignore = ["FBT003", "INP001"]
+unfixable = ["F841"]
+
+[tool.ruff.mccabe]
+max-complexity = 10

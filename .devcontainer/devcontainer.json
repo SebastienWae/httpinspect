@@ -1,0 +1,31 @@
+{
+  "name": "httpinspect",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "eamodio.gitlens",
+        "Gruntfuggly.todo-tree",
+        "stackbreak.comment-divider",
+        "usernamehw.errorlens",
+        "dbaeumer.vscode-eslint",
+        "christian-kohler.npm-intellisense",
+        "csstools.postcss",
+        "esbenp.prettier-vscode",
+        "bradlc.vscode-tailwindcss",
+        "charliermarsh.ruff",
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "tamasfe.even-better-toml",
+        "pascalsenn.keyboard-quickfix"
+      ],
+      "settings": {}
+    }
+  },
+  "remoteEnv": {
+    "EDITOR": "code -w"
+  },
+  "remoteUser": "dev"
+}

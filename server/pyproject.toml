@@ -19,6 +19,7 @@ nox = "^2022.11.21"
 nox-poetry = "^1.0.2"
 fastapi = "^0.95.2"
 uvicorn = {extras = ["standard"], version = "^0.22.0"}
+sqlalchemy = "^2.0.15"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.0.262"

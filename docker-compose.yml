@@ -1,0 +1,42 @@
+# TODO: healthcheck, secrets, env
+
+services:
+  proxy:
+    image: "caddy:2.6"
+    restart: unless-stopped
+    networks:
+      - frontend
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+  database:
+    image: "postgres:15.3"
+    env_file: .env
+    restart: unless-stopped
+    networks:
+      - backend
+    volumes:
+      - postgres:/var/lib/postgresql/data
+  app:
+    build: .
+    env_file: .env
+    restart: unless-stopped
+    depends_on:
+      - database
+    networks:
+      - backend
+      - frontend
+
+networks:
+  backend:
+  frontend:
+
+volumes:
+  caddy_data:
+  caddy_config:
+  postgres:

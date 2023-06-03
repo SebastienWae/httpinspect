@@ -1,0 +1,11 @@
+services:
+  dev:
+    build: ./.devcontainer
+    env_file: .env
+    depends_on:
+      - database
+    networks:
+      - backend
+    volumes:
+      - .:/workspace:cached
+    command: /bin/sh -c "while sleep 1000; do :; done"

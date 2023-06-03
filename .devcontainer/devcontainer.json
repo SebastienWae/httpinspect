@@ -1,8 +1,14 @@
 {
   "name": "httpinspect",
-  "build": {
-    "dockerfile": "Dockerfile"
-  },
+  "workspaceFolder": "/workspace",
+  "dockerComposeFile": [
+    "../docker-compose.yml",
+    "docker-compose.dev.yml"
+  ],
+  "service": "dev",
+  "runServices": [
+    "database"
+  ],
   "customizations": {
     "vscode": {
       "extensions": [

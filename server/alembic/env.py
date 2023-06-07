@@ -4,6 +4,7 @@ import sysconfig
 from collections.abc import Mapping
 from logging.config import fileConfig
 from pathlib import Path
+from subprocess import call
 
 from sqlalchemy import Connection, pool
 from sqlalchemy.ext.asyncio import async_engine_from_config
@@ -16,31 +17,12 @@ from httpinspect.models.user import UserModel
 
 SQLALCHEMY_DATABASE_URL = f"postgresql+asyncpg://{os.getenv('POSTGRES_USER')}:{os.getenv('POSTGRES_PASSWORD')}@database/{os.getenv('POSTGRES_DB')}"
 
-# this is the Alembic Config object, which provides
-# access to the values within the .ini file in use.
 config = context.config
 
-# Interpret the config file for Python logging.
-# This line sets up loggers basically.
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-# add your model's MetaData object here
-# for 'autogenerate' support
-# from myapp import mymodel
-# target_metadata = mymodel.Base.metadata
 target_metadata = Base.metadata
-
-# other values from the config, defined by the needs of env.py,
-# can be acquired:
-# my_important_option = config.get_main_option("my_important_option")
-# ... etc.
-
-
-@write_hooks.register("ruff")
-def run_ruff(filename: str, _: Mapping[str, str | int]) -> None:
-    ruff = Path(sysconfig.get_path("scripts"), "ruff")
-    os.spawnv(os.P_WAIT, ruff, [ruff, filename, "--fix", "--exit-zero"])
 
 
 def run_migrations_offline() -> None:
@@ -91,6 +73,12 @@ async def run_migrations_online() -> None:
         await connection.run_sync(do_run_migrations)
 
     await connectable.dispose()
+
+
+@write_hooks.register("ruff")
+def run_ruff(filename: str, _: Mapping[str, str | int]) -> None:
+    ruff = Path(sysconfig.get_path("scripts"), "ruff")
+    call([str(ruff), filename, "--fix", "--exit-zero"])  # noqa: S603
 
 
 if context.is_offline_mode():

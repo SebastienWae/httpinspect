@@ -1,51 +1,23 @@
-from pydantic import BaseModel
-from sqlalchemy import Column, Integer, String
-from sqlalchemy.orm import Session, relationship
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+from sqlalchemy import String
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from httpinspect.database import Base
-from httpinspect.models.endpoint import EndpointSchema
 
-
-class UserBase(BaseModel):
-    email: str
-
-
-class UserCreate(UserBase):
-    pass
-
-
-class UserSchema(UserBase):
-    id: int
-    endpoints: list[EndpointSchema] = []
-
-    class Config:
-        orm_mode = True
+if TYPE_CHECKING:
+    from httpinspect.models.endpoint import EndpointModel
 
 
 class UserModel(Base):
     __tablename__ = "users"
 
-    id = Column(Integer, primary_key=True, index=True)
-    email = Column(String, unique=True, index=True)
+    id: Mapped[int] = mapped_column(primary_key=True)  # noqa: A003
+    email: Mapped[str] = mapped_column(String, unique=True)
 
-    endpoints = relationship("Endpoint", back_populates="owner")
-
-
-def get_user(db: Session, user_id: int) -> UserModel | None:
-    return db.query(UserModel).filter(UserModel.id == user_id).first()
-
-
-def get_user_by_email(db: Session, email: str) -> UserModel | None:
-    return db.query(UserModel).filter(UserModel.email == email).first()
-
-
-def get_users(db: Session, skip: int = 0, limit: int = 100) -> list[UserModel]:
-    return db.query(UserModel).offset(skip).limit(limit).all()
-
-
-def create_user(db: Session, user: UserCreate) -> UserModel:
-    db_user = UserModel(**user.dict())
-    db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
-    return db_user
+    endpoints: Mapped[list["EndpointModel"]] = relationship(
+        back_populates="owner",
+        cascade="save-update, merge, expunge, delete, delete-orphan",
+    )

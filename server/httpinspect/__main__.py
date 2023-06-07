@@ -1,4 +1,17 @@
+from sys import exit, stderr
+
 import uvicorn
 
 if __name__ == "__main__":
-    uvicorn.run("httpinspect.main:app", host="0.0.0.0", port=8000, reload=True)
+    hostname = "localhost"
+
+    if hostname is not None:
+        uvicorn.run(
+            "httpinspect.app:server",
+            host=hostname,
+            port=8000,
+            reload=True,
+        )
+    else:
+        print("HOSTNAME environment variable not set.", stderr)
+        exit(1)

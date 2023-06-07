@@ -1,7 +1,18 @@
+from collections.abc import AsyncGenerator
 from os import getenv
 
-from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.ext.asyncio import (
+    AsyncAttrs,
+    AsyncSession,
+    async_sessionmaker,
+    create_async_engine,
+)
+from sqlalchemy.orm import DeclarativeBase
+
+
+class Base(AsyncAttrs, DeclarativeBase):
+    pass
+
 
 SQLALCHEMY_DATABASE_URL = f"postgresql+asyncpg://{getenv('POSTGRES_USER')}:{getenv('POSTGRES_PASSWORD')}@database/{getenv('POSTGRES_DB')}"
 
@@ -10,6 +21,18 @@ engine = create_async_engine(
     future=True,
     echo=True,
 )
-session = async_sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-Base = declarative_base()
+async_session = async_sessionmaker(autocommit=False, bind=engine)
+
+
+async def init_db() -> None:
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+
+
+async def get_db() -> AsyncGenerator[AsyncSession, None]:
+    db = async_session()
+    try:
+        yield db
+    finally:
+        await db.close()

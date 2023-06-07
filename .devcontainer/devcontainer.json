@@ -23,6 +23,7 @@
         "bradlc.vscode-tailwindcss",
         "charliermarsh.ruff",
         "ms-python.python",
+        "matangover.mypy",
         "ms-python.vscode-pylance",
         "tamasfe.even-better-toml",
         "pascalsenn.keyboard-quickfix"

@@ -18,7 +18,10 @@ async def session(
     response = await call_next(request)
     parts = request.url.path.split("/")
     if len(parts) != 3 and parts[2] != "123":
-        return JSONResponse(content={"detail": "session id error"}, status_code=403)
+        return JSONResponse(
+            content={"detail": "session id error"},
+            status_code=403,
+        )
     return response
 
 

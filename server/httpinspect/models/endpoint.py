@@ -1,61 +1,26 @@
-from pydantic import BaseModel
-from sqlalchemy import UUID, Column, ForeignKey, Integer, String
-from sqlalchemy.orm import Session, relationship
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+from uuid import UUID  # noqa: TCH003
+
+from sqlalchemy import ForeignKey, String
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.types import Uuid
 
 from httpinspect.database import Base
 
-
-class EndpointBase(BaseModel):
-    name: str
-    uuid: str
-
-
-class EndpointCreate(EndpointBase):
-    pass
-
-
-class EndpointSchema(EndpointBase):
-    id: int
-    owner_id: int
-
-    class Config:
-        orm_mode = True
+if TYPE_CHECKING:
+    from httpinspect.models.user import UserModel
 
 
 class EndpointModel(Base):
     __tablename__ = "endpoints"
 
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String)
-    uuid = Column(UUID, unique=True)
+    id: Mapped[UUID] = mapped_column(Uuid, primary_key=True)  # noqa: A003
+    name: Mapped[str] = mapped_column(String)
 
-    owner_id = Column(Integer, ForeignKey("users.id"))
-    owner = relationship("User", back_populates="endpoints")
-
-
-def get_endpoint(db: Session, endpoint_id: int) -> EndpointModel | None:
-    return db.query(EndpointModel).filter(EndpointModel.id == endpoint_id).first()
-
-
-def get_enpoints_by_owner_id(db: Session, user_id: int) -> list[EndpointModel]:
-    return db.query(EndpointModel).filter(EndpointModel.owner_id == user_id).all()
-
-
-def search_endpoint_with_name(db: Session, endpoint_name: str) -> list[EndpointModel]:
-    return db.query(EndpointModel).filter(EndpointModel.name.match(endpoint_name)).all()
-
-
-def get_endpoints(db: Session, skip: int = 0, limit: int = 100) -> list[EndpointModel]:
-    return db.query(EndpointModel).offset(skip).limit(limit).all()
-
-
-def create_endpoint(
-    db: Session,
-    endpoint: EndpointCreate,
-    owner_id: int,
-) -> EndpointModel:
-    db_endpoint = EndpointModel(**endpoint.dict(), owner_id=owner_id)
-    db.add(db_endpoint)
-    db.commit()
-    db.refresh(db_endpoint)
-    return db_endpoint
+    owner_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    owner: Mapped["UserModel"] = relationship(
+        back_populates="endpoints",
+        cascade="save-update, merge, expunge",
+    )

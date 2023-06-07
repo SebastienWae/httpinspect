@@ -37,10 +37,10 @@ strict = true
 explicit_package_bases = true
 
 [tool.black]
-line-length = 88
+line-length = 80
 
 [tool.ruff]
-line-length = 88
+line-length = 80
 select = [
   "F", # Pyflakes
   "E", # pycodestyle (error)
@@ -87,7 +87,7 @@ select = [
   # "NPY", # NumPy-specific rules
   "RUF", # Ruff-specific rules
 ]
-ignore = ["FBT003", "INP001"]
+ignore = ["FBT003", "INP001", "B008", "UP006", "UP007", "UP037"]
 unfixable = ["F841"]
 
 [tool.ruff.mccabe]

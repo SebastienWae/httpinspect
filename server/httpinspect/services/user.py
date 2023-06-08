@@ -30,11 +30,11 @@ class UserService:
 
     async def get_users(
         self: Self,
-        skip: int = 0,
+        offset: int = 0,
         limit: int = 100,
     ) -> list[UserSchema]:
         transaction = await self._db.scalars(
-            select(UserModel).offset(skip).limit(limit),
+            select(UserModel).offset(offset).limit(limit),
         )
         return [UserSchema.from_orm(endpoint) for endpoint in transaction.all()]
 
@@ -47,3 +47,11 @@ class UserService:
         await self._db.commit()
         await self._db.refresh(db_user)
         return UserSchema.from_orm(db_user)
+
+    async def remove_user(self: Self, user_id: int) -> bool:
+        user = await self._db.get(UserModel, user_id)
+        if user is None:
+            return False
+        await self._db.delete(user)
+        await self._db.commit()
+        return True

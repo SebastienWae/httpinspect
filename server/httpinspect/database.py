@@ -25,11 +25,6 @@ engine = create_async_engine(
 async_session = async_sessionmaker(autocommit=False, bind=engine)
 
 
-async def init_db() -> None:
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
-
-
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
     db = async_session()
     try:

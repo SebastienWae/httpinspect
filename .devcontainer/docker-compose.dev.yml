@@ -9,3 +9,16 @@ services:
     volumes:
       - .:/workspace:cached
     command: /bin/sh -c "while sleep 1000; do :; done"
+
+  pg-admin:
+    image: dpage/pgadmin4
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=dev@dev.com
+      - PGADMIN_DEFAULT_PASSWORD=dev
+    depends_on:
+      - database
+    networks:
+      - backend
+    ports:
+      - 8080:80
+    restart: always

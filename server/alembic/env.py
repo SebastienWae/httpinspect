@@ -1,21 +1,20 @@
 import asyncio
-import os
 import sysconfig
 from collections.abc import Mapping
 from logging.config import fileConfig
 from pathlib import Path
 from subprocess import call
 
-from sqlalchemy import Connection, pool
+from sqlalchemy import pool
+from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from alembic import context
 from alembic.script import write_hooks
-from httpinspect.database import Base
+from httpinspect.database import SQLALCHEMY_DATABASE_URL, Base
 from httpinspect.models.endpoint import EndpointModel
+from httpinspect.models.request import RequestModel
 from httpinspect.models.user import UserModel
-
-SQLALCHEMY_DATABASE_URL = f"postgresql+asyncpg://{os.getenv('POSTGRES_USER')}:{os.getenv('POSTGRES_PASSWORD')}@database/{os.getenv('POSTGRES_DB')}"
 
 config = context.config
 
@@ -23,6 +22,8 @@ if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
 target_metadata = Base.metadata
+
+config.set_main_option("sqlalchemy.url", SQLALCHEMY_DATABASE_URL)
 
 
 def run_migrations_offline() -> None:
@@ -38,7 +39,6 @@ def run_migrations_offline() -> None:
 
     """
     context.configure(
-        url=SQLALCHEMY_DATABASE_URL,
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
@@ -55,17 +55,15 @@ def do_run_migrations(connection: Connection) -> None:
         context.run_migrations()
 
 
-async def run_migrations_online() -> None:
-    """Run migrations in 'online' mode.
-
-    In this scenario we need to create an Engine
+async def run_async_migrations() -> None:
+    """In this scenario we need to create an Engine
     and associate a connection with the context.
 
     """
+
     connectable = async_engine_from_config(
         config.get_section(config.config_ini_section, {}),
         prefix="sqlalchemy.",
-        url=SQLALCHEMY_DATABASE_URL,
         poolclass=pool.NullPool,
     )
 
@@ -75,13 +73,19 @@ async def run_migrations_online() -> None:
     await connectable.dispose()
 
 
-@write_hooks.register("ruff")
-def run_ruff(filename: str, _: Mapping[str, str | int]) -> None:
-    ruff = Path(sysconfig.get_path("scripts"), "ruff")
-    call([str(ruff), filename, "--fix", "--exit-zero"])  # noqa: S603
+def run_migrations_online() -> None:
+    """Run migrations in 'online' mode."""
+
+    asyncio.run(run_async_migrations())
 
 
 if context.is_offline_mode():
     run_migrations_offline()
 else:
-    asyncio.run(run_migrations_online())
+    run_migrations_online()
+
+
+@write_hooks.register("ruff")
+def run_ruff(filename: str, _: Mapping[str, str | int]) -> None:
+    ruff = Path(sysconfig.get_path("scripts"), "ruff")
+    call([str(ruff), filename, "--fix", "--exit-zero"])  # noqa: S603

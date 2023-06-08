@@ -10,6 +10,7 @@ from sqlalchemy.types import Uuid
 from httpinspect.database import Base
 
 if TYPE_CHECKING:
+    from httpinspect.models.request import RequestModel
     from httpinspect.models.user import UserModel
 
 
@@ -18,6 +19,11 @@ class EndpointModel(Base):
 
     id: Mapped[UUID] = mapped_column(Uuid, primary_key=True)  # noqa: A003
     name: Mapped[str] = mapped_column(String)
+
+    requests: Mapped[list["RequestModel"]] = relationship(
+        back_populates="endpoint",
+        cascade="save-update, merge, expunge, delete, delete-orphan",
+    )
 
     owner_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
     owner: Mapped["UserModel"] = relationship(
